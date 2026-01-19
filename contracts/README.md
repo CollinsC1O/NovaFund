@@ -1,0 +1,278 @@
+# NovaFund Smart Contracts
+
+This directory contains all Soroban smart contracts for the NovaFund platform.
+
+## 📁 Contract Overview
+
+### Core Contracts
+
+1. **project-launch/** - Project creation and funding campaigns
+2. **escrow/** - Escrow management and milestone-based fund releases
+3. **profit-distribution/** - Automated investor payout distribution
+4. **subscription-pool/** - Recurring investment pool management
+5. **multi-party-payment/** - Multi-stakeholder payment splitting
+6. **reputation/** - Creator and investor reputation system
+7. **governance/** - Platform governance and voting mechanisms
+
+### Shared Libraries
+
+8. **shared/** - Common utilities, types, and helper functions
+
+## 🛠️ Development Setup
+
+### Prerequisites
+
+```bash
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Add wasm32 target
+rustup target add wasm32-unknown-unknown
+
+# Install Soroban CLI
+cargo install --locked soroban-cli --features opt
+```
+
+### Building Contracts
+
+```bash
+# Build all contracts
+cargo build --target wasm32-unknown-unknown --release
+
+# Build specific contract
+cd project-launch
+cargo build --target wasm32-unknown-unknown --release
+```
+
+### Testing Contracts
+
+```bash
+# Run all tests
+cargo test --all
+
+# Run tests for specific contract
+cd escrow
+cargo test
+```
+
+### Optimizing Contracts
+
+```bash
+# Build optimized WASM
+cargo build --target wasm32-unknown-unknown --release
+
+# Optimize with soroban-cli
+soroban contract optimize --wasm target/wasm32-unknown-unknown/release/project_launch.wasm
+```
+
+## 🚀 Deployment
+
+### Testnet Deployment
+
+```bash
+# Configure testnet
+soroban network add testnet \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase "Test SDF Network ; September 2015"
+
+# Create account (save the secret key!)
+soroban keys generate deployer --network testnet
+
+# Fund account
+soroban keys fund deployer --network testnet
+
+# Deploy contract
+soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/project_launch.wasm \
+  --source deployer \
+  --network testnet
+```
+
+### Contract Initialization
+
+Each contract requires initialization after deployment. Example:
+
+```bash
+soroban contract invoke \
+  --id CONTRACT_ID \
+  --source deployer \
+  --network testnet \
+  -- initialize \
+  --admin ADMIN_ADDRESS \
+  --fee_rate 250
+```
+
+## 📋 Contract Details
+
+### 1. Project Launch Contract
+
+**Purpose**: Manage project creation, funding goals, and contribution tracking
+
+**Key Functions**:
+- `create_project()` - Create new funding campaign
+- `contribute()` - Add funds to project
+- `finalize_funding()` - Close funding round
+- `get_project_info()` - Retrieve project details
+
+**State Management**:
+- Project metadata (IPFS hash)
+- Funding goal and deadline
+- Current funding amount
+- Contributor list and amounts
+
+### 2. Escrow Contract
+
+**Purpose**: Hold funds securely and release based on milestone completion
+
+**Key Functions**:
+- `deposit_funds()` - Lock funds in escrow
+- `submit_milestone()` - Creator submits milestone proof
+- `approve_milestone()` - Validators approve milestone
+- `release_funds()` - Automated release upon approval
+- `request_refund()` - Request funds back if milestones fail
+
+**State Management**:
+- Escrow balance
+- Milestone definitions and status
+- Validator list
+- Release schedule
+
+### 3. Profit Distribution Contract
+
+**Purpose**: Automatically distribute returns to investors proportionally
+
+**Key Functions**:
+- `register_investors()` - Record investment shares
+- `deposit_profits()` - Add profits for distribution
+- `distribute()` - Trigger automatic payout
+- `claim_dividends()` - Manual claim by investor
+- `get_share()` - Query investor's share
+
+**State Management**:
+- Investor registry with percentages
+- Claimable amounts per investor
+- Distribution history
+- Total profits distributed
+
+### 4. Subscription Pool Contract
+
+**Purpose**: Manage recurring investment contributions and pool allocations
+
+**Key Functions**:
+- `create_pool()` - Initialize new investment pool
+- `subscribe()` - Join pool with recurring amount
+- `process_deposits()` - Collect scheduled contributions
+- `rebalance()` - Adjust portfolio allocation
+- `withdraw()` - Exit pool with payout calculation
+
+**State Management**:
+- Subscriber list with schedules
+- Pool balance and allocation
+- Investment strategy parameters
+- Historical performance data
+
+### 5. Multi-Party Payment Contract
+
+**Purpose**: Split payments among multiple stakeholders automatically
+
+**Key Functions**:
+- `setup_parties()` - Define stakeholders and shares
+- `receive_payment()` - Accept incoming funds
+- `distribute_shares()` - Split to all parties
+- `update_allocation()` - Modify share percentages
+- `withdraw_share()` - Party claims their portion
+
+**State Management**:
+- Party addresses and percentages
+- Claimable balances per party
+- Vesting schedules (if applicable)
+- Payment history
+
+### 6. Reputation Contract
+
+**Purpose**: Track and manage on-chain reputation for creators and investors
+
+**Key Functions**:
+- `register_entity()` - Create reputation profile
+- `update_score()` - Modify reputation based on actions
+- `issue_badge()` - Award achievement tokens
+- `get_reputation()` - Query reputation score
+- `slash_reputation()` - Penalize bad actors
+
+**State Management**:
+- Reputation scores per address
+- Badge collection per entity
+- Historical actions and outcomes
+- Verification status
+
+### 7. Governance Contract
+
+**Purpose**: Enable platform governance and community voting
+
+**Key Functions**:
+- `create_proposal()` - Submit governance proposal
+- `vote()` - Cast vote on proposal
+- `execute_proposal()` - Implement approved changes
+- `delegate_votes()` - Delegate voting power
+- `get_voting_power()` - Query vote weight
+
+**State Management**:
+- Active proposals
+- Vote tallies
+- Voting power per address
+- Delegation mappings
+- Execution queue
+
+## 🔧 Shared Library
+
+The `shared/` directory contains common utilities:
+
+- **types.rs** - Shared data structures
+- **errors.rs** - Common error types
+- **events.rs** - Event definitions
+- **utils.rs** - Helper functions
+- **constants.rs** - Platform constants
+
+## 🧪 Testing Strategy
+
+### Unit Tests
+Each contract includes comprehensive unit tests in `src/test.rs`
+
+### Integration Tests
+Cross-contract interactions tested in `tests/` directory
+
+### Test Coverage
+```bash
+cargo tarpaulin --out Html --output-dir coverage
+```
+
+## 📊 Gas Optimization
+
+All contracts are optimized for minimal transaction costs:
+- Efficient data structures
+- Minimal storage operations
+- Optimized WASM compilation
+- Proper use of Soroban SDK features
+
+## 🔐 Security Considerations
+
+- **Access Control**: Admin-only functions protected
+- **Reentrancy Protection**: Guards on external calls
+- **Integer Overflow**: Checked arithmetic operations
+- **Input Validation**: All parameters validated
+- **Audit Status**: Pending third-party audit
+
+## 📚 Additional Resources
+
+- [Soroban Documentation](https://soroban.stellar.org/docs)
+- [Stellar Network](https://www.stellar.org/)
+- [Rust Book](https://doc.rust-lang.org/book/)
+- [NovaFund Docs](https://docs.novafund.io)
+
+## 🤝 Contributing
+
+See main [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+MIT License - see [LICENSE](../LICENSE) for details.
