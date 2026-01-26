@@ -55,6 +55,4 @@ pub enum Error {
     InvalidDeadline = 1001,
     ProjectNotFound = 1002,
     ContributionTooLow = 1003,
-    // ProjectNotActive = 1004,
-    // DeadlinePassed = 1005,
 }

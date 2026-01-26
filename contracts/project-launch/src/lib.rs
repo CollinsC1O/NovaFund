@@ -252,6 +252,7 @@ mod tests {
         let env = Env::default();
         let contract_id = env.register_contract(None, ProjectLaunch);
         let client = ProjectLaunchClient::new(&env, &contract_id);
+        env.mock_all_auths();
 
         let admin = Address::generate(&env);
 
@@ -268,6 +269,7 @@ mod tests {
         let env = Env::default();
         let contract_id = env.register_contract(None, ProjectLaunch);
         let client = ProjectLaunchClient::new(&env, &contract_id);
+        env.mock_all_auths();
 
         let admin = Address::generate(&env);
         let creator = Address::generate(&env);
@@ -320,6 +322,7 @@ mod tests {
         let env = Env::default();
         let contract_id = env.register_contract(None, ProjectLaunch);
         let client = ProjectLaunchClient::new(&env, &contract_id);
+        env.mock_all_auths();
 
         let admin = Address::generate(&env);
         let creator = Address::generate(&env);
