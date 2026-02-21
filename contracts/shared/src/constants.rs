@@ -35,3 +35,7 @@ pub const GOVERNANCE_QUORUM: u32 = 2000;
 
 /// Voting period duration (7 days in seconds)
 pub const VOTING_PERIOD: u64 = 604800;
+
+// Max & Min threshold consts
+pub const MIN_APPROVAL_THRESHOLD: u32 = 5100;  // 51% minimum
+pub const MAX_APPROVAL_THRESHOLD: u32 = 10000; // 100% maximum
